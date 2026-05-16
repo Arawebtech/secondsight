@@ -1,0 +1,12 @@
+[13-Nov-2025 21:24:44 America/Boise] PHP Fatal error:  Uncaught Error: Interface "PHPMailer\PHPMailer\OAuthTokenProvider" not found in /home2/jhbewdmy/public_html/secondsightfoundation/PHPMailer/src/OAuth.php:36
+Stack trace:
+#0 {main}
+  thrown in /home2/jhbewdmy/public_html/secondsightfoundation/PHPMailer/src/OAuth.php on line 36
+[13-Nov-2025 23:04:14 America/Boise] PHP Fatal error:  Uncaught Error: Interface "PHPMailer\PHPMailer\OAuthTokenProvider" not found in /home2/jhbewdmy/public_html/secondsightfoundation/PHPMailer/src/OAuth.php:36
+Stack trace:
+#0 {main}
+  thrown in /home2/jhbewdmy/public_html/secondsightfoundation/PHPMailer/src/OAuth.php on line 36
+[17-Nov-2025 20:46:32 America/Boise] PHP Fatal error:  Uncaught Error: Interface "PHPMailer\PHPMailer\OAuthTokenProvider" not found in /home2/jhbewdmy/public_html/secondsightfoundation/PHPMailer/src/OAuth.php:36
+Stack trace:
+#0 {main}
+  thrown in /home2/jhbewdmy/public_html/secondsightfoundation/PHPMailer/src/OAuth.php on line 36
