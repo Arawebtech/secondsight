@@ -82,6 +82,7 @@ if (isset($_POST['send_mail'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="<?=BASE_URL;?>assets/images/logo-fav.png" type="image/png">
     <?php include("include/header.php");?>
     <style>
         .forgot-container {

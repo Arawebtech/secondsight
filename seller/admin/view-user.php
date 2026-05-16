@@ -33,7 +33,7 @@ if (isset($_GET['del'])) {
   <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css">
   <link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
-  <link rel="icon" type="image/png" href="https://secondsightfoundation.com/assets/img/logo-fav.png">
+  <link rel="icon" href="<?=$base_url;?>assets/images/logo-fav.png" type="image/png">
 
   <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
 </head>

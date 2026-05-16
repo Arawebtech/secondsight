@@ -3,9 +3,32 @@
 <?php
 if(isset($_POST['form_approve'])) {
 	$id = $_POST['payout_id'];
-	$statement = $pdo->prepare("UPDATE tbl_payout_requests SET status=? WHERE id=?");
-	$statement->execute(array('Paid', $id));
-	$success_message = 'Payout request approved successfully.';
+    
+    // Fetch request details first
+    $st_req = $pdo->prepare("SELECT * FROM tbl_payout_requests WHERE id = ?");
+    $st_req->execute([$id]);
+    $req = $st_req->fetch(PDO::FETCH_ASSOC);
+
+    if ($req) {
+        $user_id = $req['user_id'];
+        $amount = $req['amount'];
+        $payment_date = date('Y-m-d H:i:s');
+
+        // 1. Mark Request as Paid
+        $statement = $pdo->prepare("UPDATE tbl_payout_requests SET status=? WHERE id=?");
+        $statement->execute(array('Paid', $id));
+
+        // 2. Insert into tbl_commission_payment to reduce balance
+        // We use coupon_id = 0 for generic payout requests
+        $st_pay = $pdo->prepare("INSERT INTO tbl_commission_payment (user_id, coupon_id, amount_paid, payment_date, notes) VALUES (?, ?, ?, ?, ?)");
+        $st_pay->execute([$user_id, 0, $amount, $payment_date, 'Payout Request Approved (#'.$id.')']);
+        
+        // 3. Mark corresponding commission records as Paid
+        $st_upd = $pdo->prepare("UPDATE tbl_affiliate_commission SET status = 'Paid' WHERE user_id = ? AND status = 'Pending'");
+        $st_upd->execute([$user_id]);
+
+        $success_message = 'Payout request approved and balance updated successfully.';
+    }
 }
 
 if(isset($_POST['form_reject'])) {

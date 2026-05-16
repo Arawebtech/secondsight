@@ -279,9 +279,7 @@ if (isset($_POST['checkout_place_order'])) {
     $values = [];
     $query_cart = "SELECT * FROM tbl_cart WHERE user_id = '$user_id' AND is_ordered = '0'";
     $result_cart = mysqli_query($con, $query_cart);
-
     while ($data_cart = mysqli_fetch_assoc($result_cart)) {
-        $user_id = $data_cart['user_id'];
         $p_id = $data_cart['p_id'];
         $p_name = $data_cart['p_name'];
         $p_color = $data_cart['p_color'];
@@ -296,19 +294,16 @@ if (isset($_POST['checkout_place_order'])) {
         $unit = $data_cart['unit'];
         $sku = $data_cart['sku'];
 
-        // echo $p_actual_price; exit;
-
         $query_gst = "SELECT p_gst FROM tbl_product WHERE p_id = '$p_id'";
         $result_gst = mysqli_query($con, $query_gst);
-
         if ($row_gst = mysqli_fetch_assoc($result_gst)) {
             $p_gst = $row_gst['p_gst'];
         }
 
-        $query_gst = "select p_gst from tbl_cart where p_id = '$p_id'";
-        $result_gst = mysqli_query($con, $query_gst);
-        if ($row_gst = mysqli_fetch_assoc($result_gst)) {
-            $gst_Amount = $row_gst['p_gst'];
+        $query_gst_cart = "select p_gst from tbl_cart where p_id = '$p_id'";
+        $result_gst_cart = mysqli_query($con, $query_gst_cart);
+        if ($row_gst_cart = mysqli_fetch_assoc($result_gst_cart)) {
+            $gst_Amount = $row_gst_cart['p_gst'];
         }
 
         $tmp_s_state = strtolower($s_state);
@@ -331,7 +326,37 @@ if (isset($_POST['checkout_place_order'])) {
         $order_status = ($payment_method == 'online') ? "Payment Pending" : "Success";
         $order_date = date("d/m/Y h:i:sa");
 
-        $values[] = "('$user_id', '$order_id', '$p_id', '$p_name', '$p_color', '$p_size', '$p_price', '$p_actual_price', '$p_gst', '$gst_Amount', '$igst', '$igst_Amount', '$cgst', '$cgst_Amount', '$sgst', '$sgst_Amount', '$p_image', '$p_quantity', '$no_of_item', '$weight', '$unit', '$sku', '$entered_coupon_code', '$commission_user_id', '$b_name', '$b_phone', '$b_building', '$b_street', '$b_landmark', '$b_town', '$b_district', '$b_state', '$b_pincode', '$b_gst', '$s_name', '$s_phone', '$s_building', '$s_street', '$s_landmark', '$s_town', '$s_district', '$s_state', '$s_pincode', '$s_gst', '$full_billing_address', '$full_shipping_address', '$order_status', '$order_date')";
+        // --- Commission Calculation per Item ---
+        $item_commission_user_id = 0;
+        $commission_perc = 0;
+        $commission_amt = 0;
+
+        // 1. Check product-specific referral first (STRICT MODE)
+        if (isset($_SESSION['product_ref'][$p_id])) {
+            $item_commission_user_id = $_SESSION['product_ref'][$p_id];
+        }
+
+        if ($item_commission_user_id > 0) {
+            // Fetch commission percentage from tbl_user_coupon
+            // Priority: Specific Product > General assignment for this user
+            $stmt_cp = $pdo->prepare("SELECT percentage FROM tbl_user_coupon WHERE user_id = ? AND (p_id = ? OR p_id IS NULL) ORDER BY p_id DESC LIMIT 1");
+            $stmt_cp->execute([$item_commission_user_id, $p_id]);
+            $row_cp = $stmt_cp->fetch(PDO::FETCH_ASSOC);
+            
+            if ($row_cp) {
+                $commission_perc = $row_cp['percentage'];
+                $commission_amt = ($p_actual_price * $no_of_item) * ($commission_perc / 100);
+                
+                // Store commission record
+                $stmt_ins_comm = $pdo->prepare("INSERT INTO tbl_affiliate_commission (order_id, p_id, user_id, buyer_id, commission_percentage, commission_amount, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt_ins_comm->execute([$order_id, $p_id, $item_commission_user_id, $_SESSION['user_id'] ?? 0, $commission_perc, $commission_amt, $order_date, $order_status]);
+            } else {
+                // If no assignment exists for this partner, no commission
+                $item_commission_user_id = 0;
+            }
+        }
+
+        $values[] = "('$user_id', '$order_id', '$p_id', '$p_name', '$p_color', '$p_size', '$p_price', '$p_actual_price', '$p_gst', '$gst_Amount', '$igst', '$igst_Amount', '$cgst', '$cgst_Amount', '$sgst', '$sgst_Amount', '$p_image', '$p_quantity', '$no_of_item', '$weight', '$unit', '$sku', '$entered_coupon_code', '$item_commission_user_id', '$b_name', '$b_phone', '$b_building', '$b_street', '$b_landmark', '$b_town', '$b_district', '$b_state', '$b_pincode', '$b_gst', '$s_name', '$s_phone', '$s_building', '$s_street', '$s_landmark', '$s_town', '$s_district', '$s_state', '$s_pincode', '$s_gst', '$full_billing_address', '$full_shipping_address', '$order_status', '$order_date')";
     }
 
     $insertOrderQuery .= implode(", ", $values);
@@ -376,8 +401,10 @@ if (isset($_POST['checkout_place_order'])) {
         $update_cart_query = "UPDATE tbl_cart SET is_ordered = '1' WHERE user_id = '$user_id' AND is_ordered = '0'";
         mysqli_query($con, $update_cart_query);
 
-        // Clear coupon session
+        // Clear referral sessions
         unset($_SESSION['coupon']);
+        unset($_SESSION['product_ref']);
+        unset($_SESSION['ref_user_id']);
 
         $_SESSION['order_success'] = true;
 

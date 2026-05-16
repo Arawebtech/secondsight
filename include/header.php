@@ -24,22 +24,50 @@ else if(isset($_SESSION['temp_user_id']))
     $user_id = $_SESSION['temp_user_id'];
 
 // --- Referral Tracking ---
-if (isset($_GET['ref'])) {
-    $ref_id = intval($_GET['ref']);
-    // Verify if this user exists and is a partner (has at least one assigned coupon or just active)
-    // We'll check if the user is active for now.
-    $stmt_ref = $pdo->prepare("SELECT id FROM tbl_user WHERE id = ? AND status = 'Active' LIMIT 1");
-    $stmt_ref->execute([$ref_id]);
-    if ($stmt_ref->rowCount() > 0) {
-        $_SESSION['ref_user_id'] = $ref_id;
-        // Set cookie for 30 days
-        setcookie('ref_user_id', $ref_id, time() + (86400 * 30), "/"); 
-    }
+if (!isset($_SESSION['product_ref']) || !is_array($_SESSION['product_ref'])) {
+    $_SESSION['product_ref'] = [];
 }
 
-// Restore ref from cookie if session is missing
-if (!isset($_SESSION['ref_user_id']) && isset($_COOKIE['ref_user_id'])) {
-    $_SESSION['ref_user_id'] = intval($_COOKIE['ref_user_id']);
+if (isset($p_id)) {
+    // If we are on a product page, check for 'ref'
+    if (isset($_GET['ref'])) {
+        $ref_val = $_GET['ref'];
+        $partner_id = 0;
+
+        // Check if ref is numeric (ID) or string (ref_code)
+        if (is_numeric($ref_val)) {
+            $stmt_ref = $pdo->prepare("SELECT id FROM tbl_user WHERE id = ? AND status = 'Active' LIMIT 1");
+            $stmt_ref->execute([intval($ref_val)]);
+        } else {
+            $stmt_ref = $pdo->prepare("SELECT id FROM tbl_user WHERE ref_code = ? AND status = 'Active' LIMIT 1");
+            $stmt_ref->execute([$ref_val]);
+        }
+
+        if ($stmt_ref->rowCount() > 0) {
+            $partner_id = $stmt_ref->fetchColumn();
+            $_SESSION['product_ref'][$p_id] = $partner_id;
+            // No cookie for strict product-based URL referral
+        }
+    } else {
+        // STRICTOR: If on product page WITHOUT ref, clear any existing referral for this product
+        // This handles the case where they previously clicked a link but now came back directly.
+        unset($_SESSION['product_ref'][$p_id]);
+    }
+} else {
+    // General referral (homepage/other pages)
+    if (isset($_GET['ref'])) {
+        $ref_val = $_GET['ref'];
+        if (is_numeric($ref_val)) {
+            $stmt_ref = $pdo->prepare("SELECT id FROM tbl_user WHERE id = ? AND status = 'Active' LIMIT 1");
+            $stmt_ref->execute([intval($ref_val)]);
+        } else {
+            $stmt_ref = $pdo->prepare("SELECT id FROM tbl_user WHERE ref_code = ? AND status = 'Active' LIMIT 1");
+            $stmt_ref->execute([$ref_val]);
+        }
+        if ($stmt_ref->rowCount() > 0) {
+            $_SESSION['ref_user_id'] = $stmt_ref->fetchColumn();
+        }
+    }
 }
     
     $taglines = [];
@@ -95,7 +123,7 @@ $product_og_img = !empty($product_img) ? $product_img . '?v=' . time() : null;
 <meta name="description" content="<?= htmlspecialchars($head_description) ?>">
 <meta name="keywords" content="<?= htmlspecialchars($head_keywords) ?>">
 <meta name="author" content="<?= htmlspecialchars($head_author) ?>">
-<link rel="icon" href="<?=$base_url;?>/assets/images/logo-fav.png" type="image/png">
+<link rel="icon" href="<?=$base_url;?>assets/images/logo-fav.png" type="image/png">
 <title><?= htmlspecialchars($head_title) ?></title>
 
 <?php if($product_og_title && $product_og_url && $product_og_img): ?>
@@ -142,7 +170,7 @@ $product_og_img = !empty($product_img) ? $product_img . '?v=' . time() : null;
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&amp;display=swap" rel="stylesheet">
-  <!-- âœ… Swiper CSS -->
+  <!-- ✅ Swiper CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 
   <!-- Font Awesome for Stars & Arrows -->

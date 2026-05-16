@@ -58,6 +58,7 @@ if ($result_coupons) {
 
 <head>
     <title>My Account | Dashboard</title>
+    <link rel="icon" href="<?=BASE_URL;?>assets/images/logo-fav.png" type="image/png">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -347,24 +348,20 @@ if ($result_coupons) {
                                 <?php if ($assigned_coupons):
                                     // Get default percentage for referral sales
                                     $total_sales = 0;
+                                    $total_sales = 0;
                                     $total_earned = 0;
                                     $total_paid = 0;
                                     
-                                    // Calculate sales and earnings specifically for assigned coupons and products
-                                    foreach ($assigned_coupons as $uc) {
-                                        $query_cond = "1=1";
-                                        if (!empty($uc['coupon_code'])) {
-                                            $query_cond = "LOWER(applied_coupon) = LOWER('{$uc['coupon_code']}')";
-                                        } elseif (!empty($uc['p_id'])) {
-                                            $query_cond = "p_id = '{$uc['p_id']}'";
-                                        }
-                                        
-                                        $q_sales = mysqli_query($con, "SELECT SUM(p_actual_price * no_of_item) as val FROM tbl_order WHERE $query_cond AND order_status = 'Success' AND commission_user_id = '$user_id'");
-                                        $d_sales = mysqli_fetch_assoc($q_sales);
-                                        $s_val = (float)($d_sales['val'] ?? 0);
-                                        $total_sales += $s_val;
-                                        $total_earned += ($s_val * (float)$uc['percentage']) / 100;
-                                    }
+                                    // Calculate using the NEW precise commission table
+                                    $q_stats = mysqli_query($con, "SELECT SUM(commission_amount) as earned FROM tbl_affiliate_commission WHERE user_id = '$user_id'");
+                                    $total_earned = (float)(mysqli_fetch_assoc($q_stats)['earned'] ?? 0);
+
+                                    // For total sales, we sum up orders linked to this partner
+                                    $q_sales = mysqli_query($con, "SELECT SUM(o.p_actual_price * o.no_of_item) as val 
+                                                                  FROM tbl_order o 
+                                                                  JOIN tbl_affiliate_commission ac ON o.order_id = ac.order_id AND o.p_id = ac.p_id
+                                                                  WHERE ac.user_id = '$user_id' AND o.order_status = 'Success'");
+                                    $total_sales = (float)(mysqli_fetch_assoc($q_sales)['val'] ?? 0);
 
                                     // Total Paid
                                     $q_p = mysqli_query($con, "SELECT SUM(amount_paid) as paid FROM tbl_commission_payment WHERE user_id = '$user_id'");
@@ -503,31 +500,16 @@ if ($result_coupons) {
                                         <tbody>
                                             <?php
                                             $has_sales = false;
-                                            $query_h = "SELECT * FROM tbl_order WHERE commission_user_id = '$user_id' AND order_status = 'Success' ORDER BY id DESC";
+                                            $query_h = "SELECT o.*, ac.commission_amount as earned_amt 
+                                                         FROM tbl_order o 
+                                                         JOIN tbl_affiliate_commission ac ON o.order_id = ac.order_id AND o.p_id = ac.p_id
+                                                         WHERE ac.user_id = '$user_id' AND o.order_status = 'Success' 
+                                                         ORDER BY o.id DESC";
                                             $res_h = mysqli_query($con, $query_h);
                                             if ($res_h && mysqli_num_rows($res_h) > 0) {
                                                 while ($h = mysqli_fetch_assoc($res_h)) {
-                                                    // Check if this product matches any assigned coupon or product
-                                                    $matched_percentage = 0;
-                                                    foreach ($assigned_coupons as $uc) {
-                                                        if (!empty($uc['coupon_code']) && strtolower($h['applied_coupon']) == strtolower($uc['coupon_code'])) {
-                                                            $matched_percentage = $uc['percentage'];
-                                                            break;
-                                                        } elseif (empty($uc['coupon_code']) && !empty($uc['p_id']) && $h['p_id'] == $uc['p_id']) {
-                                                            $matched_percentage = $uc['percentage'];
-                                                            break;
-                                                        } elseif (empty($uc['coupon_code']) && empty($uc['p_id'])) {
-                                                            $matched_percentage = $uc['percentage'];
-                                                            break;
-                                                        }
-                                                    }
-                                                    
-                                                    if ($matched_percentage == 0) {
-                                                        continue; // Skip this product, no commission earned
-                                                    }
-                                                    
                                                     $has_sales = true;
-                                                    $comm = ((float) $h['p_actual_price'] * (int) $h['no_of_item'] * $matched_percentage) / 100; ?>
+                                                    $comm = (float)$h['earned_amt']; ?>
                                                     <tr>
                                                         <td>#<?= htmlspecialchars($h['order_id']); ?><br><small><?= htmlspecialchars($h['order_date']); ?></small>
                                                         </td>
