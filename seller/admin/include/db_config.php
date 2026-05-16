@@ -7,8 +7,8 @@ $servername = "localhost";
 // $password   = "lyuzmkmy_secondseller"; 
 // $dbname     = "lyuzmkmy_secondseller";
 
-$username   = "root";
-$password   = "";
+$username   = "jhbewdmy_ssf_in";
+$password   = "jhbewdmy_ssf_in";
 $dbname     = "secondside_seller";
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
@@ -23,8 +23,8 @@ if (!$conn) {
 // $password2   = "lyuzmkmy_jhbewdmy_ssf_in"; 
 // $dbname2     = "lyuzmkmy_jhbewdmy_ssf_in";
 
-$username2   = "root";
-$password2   = "";
+$username2   = "jhbewdmy_ssf_in";
+$password2   = "jhbewdmy_ssf_in";
 $dbname2     = "jhbewdmy_ssf_in";
 
 $conn3 = mysqli_connect($servername, $username2, $password2, $dbname2);

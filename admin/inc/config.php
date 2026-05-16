@@ -35,8 +35,8 @@ $dbhost = 'localhost';
 
 
 $dbname = 'jhbewdmy_ssf_in';
-$dbuser = 'root';
-$dbpass = '';
+$dbuser = 'jhbewdmy_ssf_in';
+$dbpass = 'jhbewdmy_ssf_in';
 
 // ==============================
 // 🔌 PDO CONNECTION
