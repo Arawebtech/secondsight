@@ -36,15 +36,15 @@
 								foreach ($result as $row) {
 									$i++;
 									// Determine product display
-									$product_name = ($row['p_id'] == 0) ? 'All Products (Global)' : htmlspecialchars($row['p_name']);
+									$product_name = ($row['p_id'] == 0) ? 'All Products (Global)' : htmlspecialchars($row['p_name'] ?? '');
 									// Determine discount type
 									$discount_type = ($row['type'] == 'percent') ? '%' : '₹';
 									?>
 									<tr>
 										<td><?= $i; ?></td>
 										<td><?= $product_name; ?></td>
-										<td><?= htmlspecialchars($row['coupon_code']); ?></td>
-										<td><?= htmlspecialchars($row['amount']) . ' ' . $discount_type; ?></td>
+										<td><?= htmlspecialchars($row['coupon_code'] ?? ''); ?></td>
+										<td><?= htmlspecialchars($row['amount'] ?? '') . ' ' . $discount_type; ?></td>
 										<td>
 											<a href="coupon-edit.php?id=<?= $row['id']; ?>" class="btn btn-primary btn-xs">Edit</a>
 											<a href="#" class="btn btn-danger btn-xs" data-href="coupon-delete.php?id=<?= $row['id']; ?>" data-toggle="modal" data-target="#confirm-delete">Delete</a>

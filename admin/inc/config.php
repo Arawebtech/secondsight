@@ -26,7 +26,7 @@ date_default_timezone_set('Asia/Kolkata');
 // define("ADMIN_URL", BASE_URL . "admin/");
 define("BASE_URL", "https://secondsightfoundation.in/");
 define("ADMIN_URL", BASE_URL . "admin/");
-define("ADMIN_URL", BASE_URL . "admin/");
+// define("ADMIN_URL", BASE_URL . "admin/");
 // ==============================
 // 🗄️ DATABASE (LIVE)
 // ==============================
@@ -63,5 +63,3 @@ if (! $con) {
 }
 
 mysqli_query($con, "SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
-
-// last
