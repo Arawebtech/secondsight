@@ -48,6 +48,7 @@ if(isset($_POST['form1'])) {
 
 
     if($valid == 1) {
+        $p_is_trending = isset($_POST['p_is_trending']) ? $_POST['p_is_trending'] : 0;
 
     	if( isset($_FILES['photo']["name"]) && isset($_FILES['photo']["tmp_name"]) )
         {
@@ -116,7 +117,7 @@ if(isset($_POST['form1'])) {
         							$_POST['p_description'],
         							$_POST['p_short_description'],
         							$_POST['p_is_active'],
-        							$_POST['p_is_trending'],
+        							$p_is_trending,
         							$_POST['ecat_id'],
         							$_REQUEST['id']
         						));
@@ -156,7 +157,7 @@ if(isset($_POST['form1'])) {
         							$_POST['p_description'],
         							$_POST['p_short_description'],
         							$_POST['p_is_active'],
-        							$_POST['p_is_trending'],
+        							$p_is_trending,
         							$_POST['ecat_id'],
         							$_REQUEST['id']
         						));
