@@ -83,8 +83,8 @@ function renderProductGrid($con, $query, $cart_items, $base_url, $ribbon = '')
     $p_unit     = htmlspecialchars($row['p_unit']);
     $p_gst_per  = (float) $row['p_gst'];
     $p_gst_amt  = round(($p_price * $p_gst_per / 100), 2);
-    $p_actual_price = $p_price + $p_gst_amt;
-    $p_actual_old_price = $p_old_price + round(($p_old_price * $p_gst_per / 100), 2);
+    $p_actual_price = $p_price;
+    $p_actual_old_price = $p_old_price;
 
     $p_sku      = htmlspecialchars($row['p_sku']);
     $stock_qty  = (int) $row['in_stoke'];

@@ -106,8 +106,8 @@ $base_url = BASE_URL;
                         $p_photo = $row['photo'] ?: $row['p_featured_photo'];
                         $p_gst_per = (float) $row['p_gst'];
                         $p_gst_amt = round(($p_price * $p_gst_per / 100), 2);
-                        $p_actual_price = $p_price + $p_gst_amt;
-                        $p_actual_old_price = $p_old + round(($p_old * $p_gst_per / 100), 2);
+                        $p_actual_price = $p_price;
+                        $p_actual_old_price = $p_old;
 
                         $in_cart = $cart_items[$p_id] ?? null;
                         $cart_qty = $in_cart['qty'] ?? 0;

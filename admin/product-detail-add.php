@@ -25,7 +25,7 @@ if(isset($_POST['form1'])) {
 		$statement->execute();
 		$result = $statement->fetchAll();
 		foreach($result as $row) {
-			$ai_id=$row[10];
+			$ai_id=$row['Auto_increment'];
 		}
 		
 		/*$next_id1="";
@@ -43,7 +43,7 @@ if(isset($_POST['form1'])) {
 			$statement->execute();
 			$result = $statement->fetchAll();
 			foreach($result as $row) {
-				$next_id1=$row[10];
+				$next_id1=$row['Auto_increment'];
 			}
 			$z = $next_id1;
 
@@ -65,7 +65,7 @@ if(isset($_POST['form1'])) {
 		$statement->execute();
 		$result = $statement->fetchAll();
 		foreach($result as $row) {
-			$next_id1=$row[10];
+			$next_id1=$row['Auto_increment'];
 		}
 
 
@@ -139,12 +139,13 @@ if(isset($_POST['form1'])) {
 								<select name="p_name" class="form-control select2 top-cat">
 									<option value="">Select Product Name</option>
 									<?php
+									$selected_p_id = isset($_GET['p_id']) ? intval($_GET['p_id']) : 0;
 									$statement = $pdo->prepare("SELECT p_id, p_name FROM tbl_product ORDER BY p_id DESC");
 									$statement->execute();
 									$result = $statement->fetchAll(PDO::FETCH_ASSOC);	
 									foreach ($result as $row) {
 										?>
-										<option value="<?php echo $row['p_id']; ?>"><?php echo $row['p_name']; ?></option>
+										<option value="<?php echo $row['p_id']; ?>" <?php if($row['p_id'] == $selected_p_id) { echo 'selected'; } ?>><?php echo $row['p_name']; ?></option>
 										<?php
 									}
 									?>

@@ -64,7 +64,7 @@ if(isset($_POST['form1'])) {
 			$statement->execute();
 			$result = $statement->fetchAll();
 			foreach($result as $row) {
-				$next_id1=$row[10];
+				$next_id1=$row['Auto_increment'];
 			}
 			$z = $next_id1;
 

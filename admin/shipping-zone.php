@@ -2,7 +2,7 @@
 
 <section class="content-header">
 	<div class="content-header-left">
-		<h1>View Products</h1>
+		<h1>View Shipping Zones</h1>
 	</div>
 	<div class="content-header-right">
 		<a href="shipping-zone-add.php" class="btn btn-primary btn-sm">Add Shipping Zone</a>
@@ -66,7 +66,7 @@
             </div>
             <div class="modal-body">
                 <p>Are you sure want to delete this item?</p>
-                <p style="color:red;">Be careful! This product will be deleted from the order table, payment table, size table, color table and rating table also.</p>
+                <p style="color:red;">Be careful! This shipping zone will be deleted.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

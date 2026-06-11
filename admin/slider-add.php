@@ -26,7 +26,7 @@ if(isset($_POST['form1'])) {
 		$statement->execute();
 		$result = $statement->fetchAll();
 		foreach($result as $row) {
-			$ai_id=$row[10];
+			$ai_id=$row['Auto_increment'];
 		}
 
 

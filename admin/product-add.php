@@ -55,7 +55,7 @@ if(isset($_POST['form1'])) {
 		$statement->execute();
 		$result = $statement->fetchAll();
 		foreach($result as $row) {
-			$ai_id=$row[10];
+			$ai_id=$row['Auto_increment'];
 			//echo $ai_id."llll"; exit;
 		}
 		//if($ai_id == "")
@@ -75,7 +75,7 @@ if(isset($_POST['form1'])) {
 			$statement->execute();
 			$result = $statement->fetchAll();
 			foreach($result as $row) {
-				$next_id1=$row[10];
+				$next_id1=$row['Auto_increment'];
 			}
 			$z = $next_id1;
 
@@ -153,7 +153,9 @@ if(isset($_POST['form1'])) {
 		}
 		
 		
-    	$success_message = 'Product is added successfully.';
+    	$_SESSION['success_message'] = 'Product is added successfully. Now add variants/prices below.';
+		header("location: product-detail.php?p_id=" . $ai_id);
+		exit;
     }
 }
 ?>
@@ -336,7 +338,7 @@ if(isset($_POST['form1'])) {
                             <label class="col-sm-3 control-label">Is Trending?</label>
                             <div class="col-sm-3">
                                 <input type="hidden" name="p_is_trending" value="0">
-                                <input type="checkbox" name="p_is_trending" value="1" <?= ($row['p_is_trending'] == 1) ? 'checked' : ''; ?>>
+                                <input type="checkbox" name="p_is_trending" value="1">
                             </div>
 						</div>
 						<div class="form-group">

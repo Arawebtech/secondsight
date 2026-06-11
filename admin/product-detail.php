@@ -1,17 +1,51 @@
 <?php require_once('header.php'); ?>
 
+<?php
+$filtered_product_name = '';
+$p_id_param = '';
+if (isset($_GET['p_id'])) {
+	$p_id = intval($_GET['p_id']);
+	$p_id_param = '?p_id=' . $p_id;
+	$statement = $pdo->prepare("SELECT p_name FROM tbl_product WHERE p_id = ?");
+	$statement->execute([$p_id]);
+	$filtered_product_name = $statement->fetchColumn();
+}
+
+$success_message = '';
+if (isset($_SESSION['success_message'])) {
+	$success_message = $_SESSION['success_message'];
+	unset($_SESSION['success_message']);
+}
+?>
+
 <section class="content-header">
 	<div class="content-header-left">
-		<h1>View Products</h1>
+		<h1>
+			<?php if ($filtered_product_name != ''): ?>
+				Product Details for: <?php echo htmlspecialchars($filtered_product_name); ?>
+			<?php else: ?>
+				View Product Details
+			<?php endif; ?>
+		</h1>
 	</div>
 	<div class="content-header-right">
-		<a href="product-detail-add.php" class="btn btn-primary btn-sm">Add Product</a>
+		<?php if ($filtered_product_name != ''): ?>
+			<a href="product.php" class="btn btn-warning btn-sm" style="margin-right: 5px;">Back to Products</a>
+		<?php endif; ?>
+		<a href="product-detail-add.php<?php echo $p_id_param; ?>" class="btn btn-primary btn-sm">Add Product Detail</a>
 	</div>
 </section>
 
 <section class="content">
 	<div class="row">
 		<div class="col-md-12">
+
+			<?php if (isset($success_message) && $success_message != ''): ?>
+			<div class="callout callout-success">
+				<p><?php echo $success_message; ?></p>
+			</div>
+			<?php endif; ?>
+
 			<div class="box box-info">
 				<div class="box-body table-responsive">
 					<table id="example1" class="table table-bordered table-hover table-striped">
@@ -36,13 +70,19 @@
 						<tbody>
 							<?php
 							$i=0;
-							$statement = $pdo->prepare("SELECT * from tbl_product_price order by id ASC");
-							$statement->execute();
+							if (isset($p_id) && $p_id > 0) {
+								$statement = $pdo->prepare("SELECT * from tbl_product_price WHERE p_id = ? order by id ASC");
+								$statement->execute([$p_id]);
+							} else {
+								$statement = $pdo->prepare("SELECT * from tbl_product_price order by id ASC");
+								$statement->execute();
+							}
 							$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 							foreach ($result as $row) {
 								$i++;
-								$statement2 = $pdo->prepare("SELECT p_name from tbl_product where p_id='$row[p_id]'");
-								$statement2->execute();
+								$p_name = 'Unknown Product';
+								$statement2 = $pdo->prepare("SELECT p_name from tbl_product where p_id=?");
+								$statement2->execute([$row['p_id']]);
 								$result2 = $statement2->fetchAll(PDO::FETCH_ASSOC);
 								foreach ($result2 as $row2) {
 									$p_name = $row2['p_name'];

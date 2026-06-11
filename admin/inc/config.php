@@ -22,9 +22,11 @@ date_default_timezone_set('Asia/Kolkata');
 // ==============================
 // 🌐 BASE URL (FIXED - IMPORTANT)
 // ==============================
-define("BASE_URL", "http://localhost/araweb/secondsite-in/");
+// define("BASE_URL", "http://localhost/araweb/secondsite-in/");
+// define("ADMIN_URL", BASE_URL . "admin/");
+define("BASE_URL", "https://secondsightfoundation.in/");
 define("ADMIN_URL", BASE_URL . "admin/");
-
+define("ADMIN_URL", BASE_URL . "admin/");
 // ==============================
 // 🗄️ DATABASE (LIVE)
 // ==============================
@@ -33,18 +35,17 @@ $dbhost = 'localhost';
 // $dbuser = 'lyuzmkmy_jhbewdmy_ssf_in';
 // $dbpass = 'lyuzmkmy_jhbewdmy_ssf_in';
 
-
 $dbname = 'jhbewdmy_ssf_in';
-$dbuser = 'root';
-$dbpass = '';
+$dbuser = 'projectuser';
+$dbpass = 'Solutions@321@';
 
 // ==============================
 // 🔌 PDO CONNECTION
 // ==============================
 try {
     $pdo = new PDO("mysql:host={$dbhost};dbname={$dbname};charset=utf8mb4", $dbuser, $dbpass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 
     // Fix GROUP BY issue
@@ -52,13 +53,12 @@ try {
 } catch (PDOException $e) {
     die("PDO Error: " . $e->getMessage());
 }
-
 // ==============================
 // 🔌 MYSQLI CONNECTION
 // ==============================
 $con = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 
-if (!$con) {
+if (! $con) {
     die("MySQLi Error: " . mysqli_connect_error());
 }
 

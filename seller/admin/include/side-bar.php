@@ -14,7 +14,7 @@
       <li><a href="dashboard.php"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
       <!--<li><a href="view-service.php"><i class="fa fa-circle-o"></i> View Services</a></li>-->
       <li><a href="view-user.php"><i class="fa fa-circle-o"></i> View Users</a></li>
-      <li><a href="view-payouts.php"><i class="fa fa-money"></i> <span>Payout Requests</span></a></li>
+      <!-- <li><a href="view-payouts.php"><i class="fa fa-money"></i> <span>Payout Requests</span></a></li> -->
       <!-- <li><a href="get_user_coupons.php"><i class="fa fa-search"></i> <span>User Coupon Search</span></a></li> -->
       <li><a href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
     </ul>

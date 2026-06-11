@@ -230,8 +230,8 @@ include('include/header.php');
           // Discount Calculation
           $p_gst_per = (float)$product['p_gst'];
           $p_gst_amt = round(($product['p_current_price'] * $p_gst_per / 100), 2);
-          $p_actual_price = $product['p_current_price'] + $p_gst_amt;
-          $p_actual_old_price = (float)$product['p_old_price'] + round(((float)$product['p_old_price'] * $p_gst_per / 100), 2);
+          $p_actual_price = $product['p_current_price'];
+          $p_actual_old_price = (float)$product['p_old_price'];
 
           $discount = 0;
           if ($product['p_old_price'] > 0) {
@@ -469,8 +469,8 @@ while ($row = mysqli_fetch_assoc($related_result)) {
 
     $rel_p_gst_per = (float)$row['p_gst'];
     $rel_p_gst_amt = round(((float)$row['p_current_price'] * $rel_p_gst_per / 100), 2);
-    $rel_p_actual_price = (float)$row['p_current_price'] + $rel_p_gst_amt;
-    $rel_p_actual_old_price = (float)$row['p_old_price'] + round(((float)$row['p_old_price'] * $rel_p_gst_per / 100), 2);
+    $rel_p_actual_price = (float)$row['p_current_price'];
+    $rel_p_actual_old_price = (float)$row['p_old_price'];
 
     // ✅ check by p_id since cart is stored with p_id
     $in_cart = isset($cart_items[$rel_p_id]);

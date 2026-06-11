@@ -23,7 +23,9 @@ if(!isset($_REQUEST['id'])) {
 	$result = $statement->fetchAll(PDO::FETCH_ASSOC);							
 	foreach ($result as $row) {
 		$p_featured_photo = $row['p_featured_photo'];
-		unlink('../assets/uploads/'.$p_featured_photo);
+		if($p_featured_photo != '' && file_exists('../assets/img/product/'.$p_featured_photo)) {
+			unlink('../assets/img/product/'.$p_featured_photo);
+		}
 	}
 
 	// Getting other photo ID to unlink from folder
@@ -32,11 +34,24 @@ if(!isset($_REQUEST['id'])) {
 	$result = $statement->fetchAll(PDO::FETCH_ASSOC);							
 	foreach ($result as $row) {
 		$photo = $row['photo'];
-		unlink('../assets/uploads/product_photos/'.$photo);
+		if($photo != '' && file_exists('../assets/img/product/'.$photo)) {
+			unlink('../assets/img/product/'.$photo);
+		}
+	}
+
+	// Getting variant photos to unlink from folder
+	$statement = $pdo->prepare("SELECT photo FROM tbl_product_price WHERE p_id=?");
+	$statement->execute(array($_REQUEST['id']));
+	$result = $statement->fetchAll(PDO::FETCH_ASSOC);							
+	foreach ($result as $row) {
+		$photo = $row['photo'];
+		if($photo != '' && file_exists('../assets/img/product-detail/'.$photo)) {
+			unlink('../assets/img/product-detail/'.$photo);
+		}
 	}
 
 
-	// Delete from tbl_photo
+	// Delete from tbl_product
 	$statement = $pdo->prepare("DELETE FROM tbl_product WHERE p_id=?");
 	$statement->execute(array($_REQUEST['id']));
 
@@ -52,21 +67,25 @@ if(!isset($_REQUEST['id'])) {
 	$statement = $pdo->prepare("DELETE FROM tbl_product_color WHERE p_id=?");
 	$statement->execute(array($_REQUEST['id']));
 
+	// Delete from tbl_product_price
+	$statement = $pdo->prepare("DELETE FROM tbl_product_price WHERE p_id=?");
+	$statement->execute(array($_REQUEST['id']));
+
 	// Delete from tbl_rating
 	$statement = $pdo->prepare("DELETE FROM tbl_rating WHERE p_id=?");
 	$statement->execute(array($_REQUEST['id']));
 
-	// Delete from tbl_payment
-	$statement = $pdo->prepare("SELECT * FROM tbl_order WHERE product_id=?");
+	// Delete from tbl_payment using linked order_id
+	$statement = $pdo->prepare("SELECT DISTINCT order_id FROM tbl_order WHERE p_id=?");
 	$statement->execute(array($_REQUEST['id']));
 	$result = $statement->fetchAll(PDO::FETCH_ASSOC);							
 	foreach ($result as $row) {
-		$statement1 = $pdo->prepare("DELETE FROM tbl_payment WHERE payment_id=?");
-		$statement1->execute(array($row['payment_id']));
+		$statement1 = $pdo->prepare("DELETE FROM tbl_payment WHERE order_id=?");
+		$statement1->execute(array($row['order_id']));
 	}
 
 	// Delete from tbl_order
-	$statement = $pdo->prepare("DELETE FROM tbl_order WHERE product_id=?");
+	$statement = $pdo->prepare("DELETE FROM tbl_order WHERE p_id=?");
 	$statement->execute(array($_REQUEST['id']));
 
 	header('location: product.php');
