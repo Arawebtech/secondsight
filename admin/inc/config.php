@@ -25,22 +25,22 @@ date_default_timezone_set('Asia/Kolkata');
 // define("BASE_URL", "http://localhost/araweb/secondsite-in/");
 // define("ADMIN_URL", BASE_URL . "admin/");
 
-// define("BASE_URL", "http://localhost/araweb/githubsecondside/secondsight/");
 define("BASE_URL", "http://localhost/araweb/githubsecondside/secondsight/");
+// define("BASE_URL", "http://localhost/araweb/githubsecondside/secondsight/");
 
 define("ADMIN_URL", BASE_URL . "admin/");
 // define("ADMIN_URL", BASE_URL . "admin/");
 // ==============================
 // 🗄️ DATABASE (LIVE)
 // ==============================
-$dbhost = 'localhost';
-$dbname = 'new_jhbewdmy_ssf_in';
-$dbuser = 'root';
-$dbpass = '';
+// $dbhost = 'localhost';
+// $dbname = 'new_jhbewdmy_ssf_in';
+// $dbuser = 'root';
+// $dbpass = '';
 
-// $dbname = 'jhbewdmy_ssf_in';
-// $dbuser = 'projectuser';
-// $dbpass = 'Solutions@321@';
+$dbname = 'jhbewdmy_ssf_in';
+$dbuser = 'projectuser';
+$dbpass = 'Solutions@321@';
 
 // ==============================
 // 🔌 PDO CONNECTION
