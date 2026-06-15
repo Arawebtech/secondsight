@@ -18,18 +18,23 @@ if (!isset($_POST['coupon_code']) || empty(trim($_POST['coupon_code']))) {
 
 $coupon_code = mysqli_real_escape_string($con, trim($_POST['coupon_code']));
 
-// Fetch coupon including type (flat or percent)
-$query  = "SELECT p_id, amount, type FROM tbl_coupon WHERE coupon_code = '$coupon_code' LIMIT 1";
+// Fetch all matching coupon rules (same coupon code can be assigned to different products)
+$query  = "SELECT p_id, amount, type FROM tbl_coupon WHERE coupon_code = '$coupon_code'";
 $result = mysqli_query($con, $query);
 if (!$result || mysqli_num_rows($result) === 0) {
     $response['message'] = "Invalid or expired coupon code.";
     echo json_encode($response);
     exit;
 }
-$row = mysqli_fetch_assoc($result);
-$coupon_p_id   = (int)$row['p_id'];   // 0 => global
-$coupon_amount = (float)$row['amount'];
-$coupon_type   = $row['type'];
+
+$rules = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $rules[] = [
+        'p_id'   => (int)$row['p_id'],
+        'amount' => (float)$row['amount'],
+        'type'   => $row['type']
+    ];
+}
 
 // Resolve user id
 $user_id = $_SESSION['user_id'] ?? $_SESSION['temp_user_id'] ?? 0;
@@ -54,7 +59,17 @@ $sub_total = 0.0;
 $gst       = 0.0;
 $total     = 0.0;
 $p_total_weight = 0.0;
-$eligible_total = 0.0;
+$applied_coupon = 0.0;
+$eligible_items_count = 0;
+
+// Identify if there is a global rule
+$global_rule = null;
+foreach ($rules as $rule) {
+    if ($rule['p_id'] === 0) {
+        $global_rule = $rule;
+        break;
+    }
+}
 
 while ($cart = mysqli_fetch_assoc($result_cart)) {
     $qty          = (int)$cart['no_of_item'];
@@ -62,20 +77,47 @@ while ($cart = mysqli_fetch_assoc($result_cart)) {
     $line_gst     = (float)$cart['p_gst'] * $qty;
     $line_total   = (float)$cart['p_price'] * $qty;
     $line_weight  = (float)$cart['weight'] * $qty;
+    $p_id         = (int)$cart['p_id'];
 
     $sub_total      += $line_total;   // Base subtotal
     $gst            += $line_gst;     // Total GST
     $total          += $line_actual;  // Total including GST
     $p_total_weight += $line_weight;
 
-    // Check eligibility: global or product-specific (Apply on Price with GST as requested)
-    if ($coupon_p_id === 0 || (int)$cart['p_id'] === $coupon_p_id) {
-        $eligible_total += $line_actual;
+    // Check if there is a specific rule for this product in rules list
+    $specific_rule = null;
+    foreach ($rules as $rule) {
+        if ($rule['p_id'] === $p_id) {
+            $specific_rule = $rule;
+            break;
+        }
+    }
+
+    if ($specific_rule) {
+        $eligible_items_count++;
+        if ($specific_rule['type'] === 'percent') {
+            $discount = $line_actual * ($specific_rule['amount'] / 100);
+        } else { // flat
+            $discount = $specific_rule['amount'];
+        }
+        $applied_coupon += min($line_actual, $discount);
+    } else if ($global_rule) {
+        $eligible_items_count++;
+        if ($global_rule['type'] === 'percent') {
+            $discount = $line_actual * ($global_rule['amount'] / 100);
+            $applied_coupon += min($line_actual, $discount);
+        }
     }
 }
 
-// If no eligible total, coupon cannot apply
-if ($eligible_total <= 0) {
+// Apply global flat rule if present to the remaining total
+if ($global_rule && $global_rule['type'] === 'flat') {
+    $remaining_eligible = max(0, $total - $applied_coupon);
+    $applied_coupon += min($remaining_eligible, $global_rule['amount']);
+}
+
+// If no eligible items, coupon cannot apply
+if ($eligible_items_count === 0 && empty($global_rule)) {
     $response['message'] = "This coupon is not applicable to the products in your cart.";
     echo json_encode($response);
     exit;
@@ -117,13 +159,6 @@ if ($total >= $free_shipping && $free_shipping > 0) {
     $total_shipping = 0.0;
 }
 
-// Apply coupon
-if ($coupon_type === 'percent') {
-    $applied_coupon = min($eligible_total, ($eligible_total * $coupon_amount / 100));
-} else { // flat
-    $applied_coupon = min($eligible_total, $coupon_amount);
-}
-
 // Final grand total
 $grand_total = max(0, ($total - $applied_coupon + $total_shipping));
 
@@ -131,8 +166,8 @@ $grand_total = max(0, ($total - $applied_coupon + $total_shipping));
 $_SESSION['coupon'] = [
     'code'   => $coupon_code,
     'amount' => $applied_coupon,
-    'p_id'   => $coupon_p_id,  // 0 for global
-    'type'   => $coupon_type
+    'p_id'   => count($rules) === 1 ? $rules[0]['p_id'] : -1,
+    'type'   => count($rules) === 1 ? $rules[0]['type'] : 'mixed'
 ];
 
 // Response
