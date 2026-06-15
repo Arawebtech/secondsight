@@ -2,6 +2,16 @@
 include("admin/inc/config.php");
 session_start();
 
+// Slugify function for SEO-friendly links
+if (!function_exists('slugify')) {
+    function slugify($string) {
+        $slug = strtolower(trim($string));
+        $slug = preg_replace('/[^a-z0-9]+/i', '-', $slug); // replace non-alphanumeric
+        $slug = preg_replace('/-+/', '-', $slug); // collapse multiple hyphens
+        return trim($slug, '-');
+    }
+}
+
 $user_id = "";
 // If session exists, use it
 if (isset($_SESSION['user_id'])) {
@@ -117,12 +127,14 @@ if (isset($_SESSION['flash_message'])) {
                         ?>
                         <div class="cart-item" data-id="<?= $p_id; ?>" data-stock="<?= $available_qty; ?>" data-price="<?= $data_cart['p_price']; ?>" 
                             data-gst="<?= $data_cart['p_gst']; ?>" >
-                          <img src="<?= $base_url; ?>assets/img/product-detail/<?= $data_cart['p_image']; ?>" class="cart-item-img"
-                                style="width: 70px; height: 70px;">
-                          <div class="cart-item-details">
-                            <a href="<?= $base_url; ?>product-circle.php?p_id=<?= $data_cart['p_id']; ?>" class="text-decoration-none text-dark">
-                                        <?= htmlspecialchars($data_cart['p_name']); ?>
-                                    </a>
+                           <a href="<?= $base_url; ?>product/<?= slugify($data_cart['p_name']); ?>">
+                             <img src="<?= $base_url; ?>assets/img/product-detail/<?= $data_cart['p_image']; ?>" class="cart-item-img"
+                                  style="width: 70px; height: 70px;">
+                           </a>
+                           <div class="cart-item-details">
+                             <a href="<?= $base_url; ?>product/<?= slugify($data_cart['p_name']); ?>" class="text-decoration-none text-dark">
+                                         <?= htmlspecialchars($data_cart['p_name']); ?>
+                                     </a>
                         
                             <div class="d-flex align-items-center gap-2 my-1 justify-content-center justify-content-md-start">
                               <button class="btn btn-sm btn-outline-secondary qty-sub-cart" data-cartid="<?= $data_cart['id']; ?>">–</button>

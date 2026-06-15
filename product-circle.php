@@ -22,13 +22,15 @@ while ($cart_row = mysqli_fetch_assoc($cart_query)) {
 }
 
 // ----------------------------
-// Get slug from URL
+// Get slug or p_id from URL
 // ----------------------------
-if (!isset($_GET['slug']) || empty($_GET['slug'])) {
+$p_id_param = $_GET['p_id'] ?? '';
+$slug = $_GET['slug'] ?? '';
+
+if (empty($p_id_param) && empty($slug)) {
     header("HTTP/1.0 404 Not Found");
     exit("Product not found");
 }
-$slug = $_GET['slug'];
 
 // ----------------------------
 // Slugify function
@@ -67,14 +69,19 @@ $result = mysqli_query($con, $query);
 $product = null;
 
 // ----------------------------
-// Compare slug dynamically
+// Find product dynamically
 // ----------------------------
 while ($row = mysqli_fetch_assoc($result)) {
-    $generated_slug = slugify($row['p_name']);
-
-    if ($generated_slug === $slug) {
+    if (!empty($p_id_param) && $row['p_id'] == $p_id_param) {
         $product = $row;
         break;
+    }
+    if (!empty($slug)) {
+        $generated_slug = slugify($row['p_name']);
+        if ($generated_slug === $slug) {
+            $product = $row;
+            break;
+        }
     }
 }
 

@@ -1,5 +1,14 @@
 let cart = {};
 
+// Slugify function for SEO-friendly URLs
+function slugify(string) {
+  if (!string) return '';
+  let slug = string.toString().toLowerCase().trim();
+  slug = slug.replace(/[^a-z0-9]+/gi, '-'); // replace non-alphanumeric
+  slug = slug.replace(/-+/g, '-'); // collapse multiple hyphens
+  return slug.replace(/^-+|-+$/g, ''); // trim hyphens from ends
+}
+
 // Elements
 const cartContainer = document.getElementById("cartItemsContainer");
 const itemCount = document.getElementById("itemCount");
@@ -208,12 +217,12 @@ function renderCart() {
     const item = document.createElement("div");
     item.className = "d-flex border p-2 rounded mb-2";
     item.innerHTML = `
-    <a href="${BASE_URL}product-circle.php?p_id=${id}" style="text-decoration:none; color:black;">
+    <a href="${BASE_URL}product/${slugify(p.name)}" style="text-decoration:none; color:black;">
       <img src="${BASE_URL}assets/img/product-detail/${p.image}" 
            class="img-thumbnail me-2" style="width: 80px; height: 80px;">
            </a>
       <div class="flex-grow-1">
-      <a href="${BASE_URL}product-circle.php?p_id=${id}" style="text-decoration:none;color:black;">
+      <a href="${BASE_URL}product/${slugify(p.name)}" style="text-decoration:none;color:black;">
         <div class="fw-semibold">${p.name}</div>
         </a>
         <div class="d-flex align-items-center gap-2 my-1">
