@@ -1,36 +1,36 @@
-<?php 
-include("admin/inc/config.php");
-session_start();
+<?php
+    include "admin/inc/config.php";
+    session_start();
 
-// Load PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-require 'PHPMailer/src/Exception.php';
-require 'PHPMailer/src/PHPMailer.php';
-require 'PHPMailer/src/SMTP.php';
+    // Load PHPMailer
+    use PHPMailer\PHPMailer\Exception;
+    use PHPMailer\PHPMailer\PHPMailer;
+    require 'PHPMailer/src/Exception.php';
+    require 'PHPMailer/src/PHPMailer.php';
+    require 'PHPMailer/src/SMTP.php';
 
-$message = "";
+    $message = "";
 
-if (isset($_POST['send_mail'])) {
+    if (isset($_POST['send_mail'])) {
     $to_mail = mysqli_real_escape_string($con, trim($_POST['email']));
-    
-    if (!filter_var($to_mail, FILTER_VALIDATE_EMAIL)) {
+
+    if (! filter_var($to_mail, FILTER_VALIDATE_EMAIL)) {
         $message = "<div class='alert alert-danger'>Invalid email address.</div>";
     } else {
         // Check if email exists
-        $query = "SELECT id FROM tbl_user WHERE email = '$to_mail'";
+        $query  = "SELECT id FROM tbl_user WHERE email = '$to_mail'";
         $result = mysqli_query($con, $query);
 
         if (mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
+            $row     = mysqli_fetch_assoc($result);
             $user_id = $row['id'];
 
             // Generate secure token
-            $token = bin2hex(random_bytes(50));
+            $token  = bin2hex(random_bytes(50));
             $expiry = date("Y-m-d H:i:s", strtotime('+1 hour'));
 
             // Store or update token
-            $insert = "INSERT INTO tbl_password_resets (user_id, token, expires_at) 
+            $insert = "INSERT INTO tbl_password_resets (user_id, token, expires_at)
                        VALUES ('$user_id', '$token', '$expiry')
                        ON DUPLICATE KEY UPDATE token='$token', expires_at='$expiry'";
             mysqli_query($con, $insert);
@@ -39,7 +39,7 @@ if (isset($_POST['send_mail'])) {
             $reset_link = BASE_URL . "reset-password.php?token=" . $token;
 
             // Build Email Body
-            $subject = "Reset Your Password - SSF";
+            $subject      = "Reset Your Password - SSF";
             $message_body = "
                 <p>Hello,</p>
                 <p>We received a request to reset your password.</p>
@@ -57,7 +57,7 @@ if (isset($_POST['send_mail'])) {
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'gurujimanishsharma@gmail.com'; // your Gmail
-                $mail->Password   = 'jnwo hxpp bphv rjkm';   // Gmail App Password
+                $mail->Password   = 'utuh tlyi drhv zypf';          // Gmail App Password
                 $mail->SMTPSecure = 'tls';
                 $mail->Port       = 587;
 
@@ -74,16 +74,16 @@ if (isset($_POST['send_mail'])) {
                 $message = "<div class='alert alert-danger'>Mailer Error: {$mail->ErrorInfo}</div>";
             }
         } else {
-            $message = "<div class='alert alert-warning'>No account found with that email address.</div>";   
+            $message = "<div class='alert alert-warning'>No account found with that email address.</div>";
         }
     }
-}
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="<?=BASE_URL;?>assets/images/logo-fav.png" type="image/png">
-    <?php include("include/header.php");?>
+    <link rel="icon" href="<?php echo BASE_URL;?>assets/images/logo-fav.png" type="image/png">
+    <?php include "include/header.php"; ?>
     <style>
         .forgot-container {
             max-width: 500px;
@@ -137,7 +137,10 @@ if (isset($_POST['send_mail'])) {
                 <div id="content" class="site-content" role="main">
                     <div class="forgot-container">
                         <h2>Reset Your Password</h2>
-                        <?php if(!empty($message)) echo $message; ?>
+                        <?php if (! empty($message)) {
+                                echo $message;
+                            }
+                        ?>
                         <form method="post" action="">
                             <input type="email" name="email" placeholder="Enter your registered email" required>
                             <input type="submit" name="send_mail" value="Send Reset Link">
@@ -146,6 +149,6 @@ if (isset($_POST['send_mail'])) {
                 </div>
             </div>
         </div>
-    <?php include("include/footer.php");?>
+    <?php include "include/footer.php"; ?>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <?php
 // Load PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
 require 'PHPMailer/src/Exception.php';
 require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
@@ -18,15 +18,15 @@ if (isset($_POST['send_mail'])) {
     try {
         // Server settings
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';  
+        $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'gurujimanishsharma@gmail.com'; 
-        $mail->Password   = 'jnwo hxpp bphv rjkm';  
-        $mail->SMTPSecure = 'tls'; 
-        $mail->Port       = 587;   
+        $mail->Username   = 'gurujimanishsharma@gmail.com';
+        $mail->Password   = 'utuh tlyi drhv zypf';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
 
         // Recipients
-        $mail->setFrom($email, $firstName.' '.$lastName);
+        $mail->setFrom($email, $firstName . ' ' . $lastName);
         $mail->addAddress('gurujimanishsharma@gmail.com', 'Secondsight Foundation Contact-Form');
 
         // Content
@@ -47,4 +47,3 @@ if (isset($_POST['send_mail'])) {
         echo "<script>alert('Message could not be sent. Error: {$mail->ErrorInfo}'); window.location.href='index.php';</script>";
     }
 }
-?>
