@@ -37,6 +37,8 @@ $dbhost = 'localhost';
 // $dbuser = 'root';
 // $dbpass = '';
 
+// bb
+
 $dbname = 'jhbewdmy_ssf_in';
 $dbuser = 'projectuser';
 $dbpass = 'Solutions@321@';
