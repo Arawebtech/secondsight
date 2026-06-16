@@ -22,9 +22,9 @@ date_default_timezone_set('Asia/Kolkata');
 // ==============================
 // 🌐 BASE URL (FIXED - IMPORTANT)
 // ==============================
-// define("BASE_URL", "http://localhost/araweb/githubsecondside/secondsight/");
+define("BASE_URL", "http://localhost/araweb/githubsecondside/secondsight/");
 // define("ADMIN_URL", BASE_URL . "admin/");
-define("BASE_URL", "https://secondsightfoundation.in/");
+// define("BASE_URL", "https://secondsightfoundation.in/");
 define("ADMIN_URL", BASE_URL . "admin/");
 // define("ADMIN_URL", BASE_URL . "admin/");
 // ==============================
@@ -32,16 +32,14 @@ define("ADMIN_URL", BASE_URL . "admin/");
 // ==============================
 $dbhost = 'localhost';
 
-// $dbname = 'new_jhbewdmy_ssf_in';
+$dbname = 'new_jhbewdmy_ssf_in';
 
-// $dbuser = 'root';
-// $dbpass = '';
+$dbuser = 'root';
+$dbpass = '';
 
-// bb
-
-$dbname = 'jhbewdmy_ssf_in';
-$dbuser = 'projectuser';
-$dbpass = 'Solutions@321@';
+// $dbname = 'jhbewdmy_ssf_in';
+// $dbuser = 'projectuser';
+// $dbpass = 'Solutions@321@';
 
 // ==============================
 // 🔌 PDO CONNECTION
