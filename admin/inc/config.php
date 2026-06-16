@@ -33,6 +33,7 @@ define("ADMIN_URL", BASE_URL . "admin/");
 $dbhost = 'localhost';
 
 // $dbname = 'new_jhbewdmy_ssf_in';
+
 // $dbuser = 'root';
 // $dbpass = '';
 
