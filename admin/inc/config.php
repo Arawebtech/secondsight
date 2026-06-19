@@ -24,7 +24,7 @@ date_default_timezone_set('Asia/Kolkata');
 // ==============================
 // define("BASE_URL", "http://localhost/araweb/githubsecondside/secondsight/");
 // define("ADMIN_URL", BASE_URL . "admin/");
-define("BASE_URL", "https://secondsightfoundation.in/");
+define("BASE_URL", "https://ssfhealth.in/");
 define("ADMIN_URL", BASE_URL . "admin/");
 // define("ADMIN_URL", BASE_URL . "admin/");
 // ==============================
@@ -37,9 +37,10 @@ $dbhost = 'localhost';
 // $dbuser = 'root';
 // $dbpass = '';
 
-$dbname = 'jhbewdmy_ssf_in';
-$dbuser = 'projectuser';
-$dbpass = 'Solutions@321@';
+
+$dbname   = "jhbewdmy_health";
+$dbuser = "myuser";
+$dbpass = "Solutions@321@";
 
 // ==============================
 // 🔌 PDO CONNECTION
